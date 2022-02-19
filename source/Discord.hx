@@ -3,6 +3,11 @@ package;
 import Sys.sleep;
 import discord_rpc.DiscordRpc;
 
+#if LUA_ALLOWED
+import llua.Lua;
+import llua.State;
+#end
+
 using StringTools;
 
 class DiscordClient
@@ -11,7 +16,7 @@ class DiscordClient
 	{
 		trace("Discord Client starting...");
 		DiscordRpc.start({
-			clientID: "814588678700924999",
+			clientID: "863222024192262205",
 			onReady: onReady,
 			onError: onError,
 			onDisconnected: onDisconnected
@@ -27,7 +32,7 @@ class DiscordClient
 
 		DiscordRpc.shutdown();
 	}
-
+	
 	public static function shutdown()
 	{
 		DiscordRpc.shutdown();
@@ -39,7 +44,7 @@ class DiscordClient
 			details: "In the Menus",
 			state: null,
 			largeImageKey: 'icon',
-			largeImageText: "Friday Night Funkin'"
+			largeImageText: "FNF: Refunk Engine"
 		});
 	}
 
@@ -75,7 +80,7 @@ class DiscordClient
 			details: details,
 			state: state,
 			largeImageKey: 'icon',
-			largeImageText: "Friday Night Funkin'",
+			largeImageText: "Engine Version: " + MainMenuState.refunkVersion,
 			smallImageKey : smallImageKey,
 			// Obtained times are in milliseconds so they are divided so Discord can use it
 			startTimestamp : Std.int(startTimestamp / 1000),
@@ -84,4 +89,12 @@ class DiscordClient
 
 		//trace('Discord RPC Updated. Arguments: $details, $state, $smallImageKey, $hasStartTimestamp, $endTimestamp');
 	}
+
+	#if LUA_ALLOWED
+	public static function addLuaCallbacks(lua:State) {
+		Lua_helper.add_callback(lua, "changePresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float) {
+			changePresence(details, state, smallImageKey, hasStartTimestamp, endTimestamp);
+		});
+	}
+	#end
 }
