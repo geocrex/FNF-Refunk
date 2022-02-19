@@ -23,6 +23,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
+import flixel.FlxObject;
 import Controls;
 
 using StringTools;
@@ -54,6 +55,9 @@ class OptionsState extends MusicBeatState
 	var selectorLeft:Alphabet;
 	var selectorRight:Alphabet;
 
+	var camFollow:FlxObject;
+	var camFollowPos:FlxObject;
+
 	override function create() {
 		#if desktop
 		DiscordClient.changePresence("Options Menu", null);
@@ -66,6 +70,13 @@ class OptionsState extends MusicBeatState
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
+
+		FlxG.camera.follow(camFollowPos, null, 1);
+
+		FlxG.camera.zoom = 3;
+ 		FlxG.camera.fade(FlxG.camera.bgColor, 1, true);
+ 		FlxTween.tween(FlxG.camera, {zoom: 1}, 1.1, {ease: FlxEase.expoInOut});
+ 		FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quartInOut});
 
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);

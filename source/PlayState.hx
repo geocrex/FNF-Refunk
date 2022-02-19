@@ -63,7 +63,22 @@ class PlayState extends MusicBeatState
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
 
+	
 	public static var ratingStuff:Array<Dynamic> = [
+		['Ew', 0.2], //From 0% to 19%
+		['D', 0.4], //From 20% to 39%
+		['C', 0.5], //From 40% to 49%
+		['B', 0.6], //From 50% to 59%
+		['A', 0.69], //From 60% to 68%
+		['Nice', 0.7], //69%
+		['A+', 0.8], //From 70% to 79%
+		['S-', 0.9], //From 80% to 89%
+		['S', 0.95], //From 89% to 95%
+		['S+', 1], //From 95% to 99%
+		['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+	];
+
+	public static var simpleRatingStuff:Array<Dynamic> = [
 		['You Suck!', 0.2], //From 0% to 19%
 		['Shit', 0.4], //From 20% to 39%
 		['Bad', 0.5], //From 40% to 49%
@@ -222,6 +237,7 @@ class PlayState extends MusicBeatState
 	public var scoreTxt:FlxText;
 	var timeTxt:FlxText;
 	var scoreTxtTween:FlxTween;
+	var comboSprites:Array<FlxSprite>=[];
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
@@ -2176,11 +2192,23 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		if(ratingName == '?') {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName;
-		} else {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
+		if(!ClientPrefs.simpleRatings)
+		{
+			if(ratingName == '?') {
+				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rank: ' + ratingName;
+			} else {
+				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rank: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
+			}
 		}
+		else {
+			if(ratingName == '?') {
+				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rank: ' + ratingName;
+			} else {
+				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Math.floor(ratingPercent * 100) + '%)';//peeps could want some integer rating
+			}
+			
+		}
+		
 
 		if(botplayTxt.visible) {
 			botplaySine += 180 * elapsed;
@@ -3129,7 +3157,7 @@ class PlayState extends MusicBeatState
 
 				if (storyPlaylist.length <= 0)
 				{
-					FlxG.sound.playMusic(Paths.music('freakyMenu'));
+					FlxG.sound.playMusic(Paths.music('giveALil'));
 
 					cancelMusicFadeTween();
 					CustomFadeTransition.nextCamera = camOther;
@@ -3200,12 +3228,14 @@ class PlayState extends MusicBeatState
 					CustomFadeTransition.nextCamera = null;
 				}
 				MusicBeatState.switchState(new FreeplayState());
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				FlxG.sound.playMusic(Paths.music('giveALil'));
 				changedDifficulty = false;
 			}
 			transitioning = true;
 		}
 	}
+
+
 
 	#if ACHIEVEMENTS_ALLOWED
 	var achievementObj:AchievementObject = null;
@@ -3329,6 +3359,12 @@ class PlayState extends MusicBeatState
 		rating.acceleration.y = 550;
 		rating.velocity.y -= FlxG.random.int(140, 175);
 		rating.velocity.x -= FlxG.random.int(0, 10);
+		// COOL RATING ZOOM STUFF!
+		var scaleX = rating.scale.x;
+		var scaleY = rating.scale.y;
+		rating.scale.scale(1.01);
+		FlxTween.tween(rating, {"scale.x": 1, "scale.y": 1}, FlxG.random.float(0.2, 0.45), {ease: FlxEase.quadInOut});
+		FlxTween.linearMotion(rating, rating.x, rating.y, rating.x, rating.y + 5, FlxG.random.float(0.2, 0.45), true, {ease: FlxEase.quadInOut});
 		rating.visible = !ClientPrefs.hideHud;
 		rating.x += ClientPrefs.comboOffset[0];
 		rating.y -= ClientPrefs.comboOffset[1];
@@ -4294,24 +4330,42 @@ class PlayState extends MusicBeatState
 				// Rating Name
 				if(ratingPercent >= 1)
 				{
-					ratingName = ratingStuff[ratingStuff.length-1][0]; //Uses last string
+					if(!ClientPrefs.simpleRatings) {
+						ratingName = simpleRatingStuff[simpleRatingStuff.length-1][0]; //Uses last string
+					}
+					else {
+						ratingName = ratingStuff[ratingStuff.length-1][0]; //Uses last string
+					}
 				}
 				else
 				{
-					for (i in 0...ratingStuff.length-1)
-					{
-						if(ratingPercent < ratingStuff[i][1])
-						{
-							ratingName = ratingStuff[i][0];
-							break;
-						}
+					if(!ClientPrefs.simpleRatings) {
+						for (i in 0...ratingStuff.length-1)
+							{
+								if(ratingPercent < ratingStuff[i][1])
+								{
+									ratingName = ratingStuff[i][0];
+									break;
+								}
+							}
 					}
+					else {
+						for (i in 0...simpleRatingStuff.length-1)
+							{
+								if(ratingPercent < simpleRatingStuff[i][1])
+								{
+									ratingName = simpleRatingStuff[i][0];
+									break;
+								}
+							}
+					}
+					
 				}
 			}
 
 			// Rating FC
 			ratingFC = "";
-			if (sicks > 0) ratingFC = "SFC";
+			if (sicks > 0) ratingFC = "MFC";
 			if (goods > 0) ratingFC = "GFC";
 			if (bads > 0 || shits > 0) ratingFC = "FC";
 			if (songMisses > 0 && songMisses < 10) ratingFC = "SDCB";

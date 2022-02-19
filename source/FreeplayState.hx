@@ -13,7 +13,9 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.FlxObject;
 import lime.utils.Assets;
 import flixel.system.FlxSound;
 import openfl.utils.Assets as OpenFlAssets;
@@ -32,6 +34,9 @@ class FreeplayState extends MusicBeatState
 	private static var curSelected:Int = 0;
 	var curDifficulty:Int = -1;
 	private static var lastDifficultyName:String = '';
+
+	var camFollow:FlxObject;
+	var camFollowPos:FlxObject;
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -87,16 +92,12 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.setDirectoryFromWeek();
 
-		/*		//KIND OF BROKEN NOW AND ALSO PRETTY USELESS//
+		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
-		for (i in 0...initSonglist.length)
-		{
-			if(initSonglist[i] != null && initSonglist[i].length > 0) {
-				var songArray:Array<String> = initSonglist[i].split(":");
-				addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
-			}
-		}*/
+		FlxG.camera.zoom = 3;
+ 		FlxG.camera.fade(FlxG.camera.bgColor, 1, true);
+ 		FlxTween.tween(FlxG.camera, {zoom: 1}, 1.1, {ease: FlxEase.expoInOut});
+ 		FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quartInOut});
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.globalAntialiasing;

@@ -12,11 +12,13 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
+import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
 import flixel.graphics.FlxGraphic;
+import flixel.FlxObject;
 import WeekData;
 
 using StringTools;
@@ -36,6 +38,9 @@ class StoryMenuState extends MusicBeatState
 
 	var txtWeekTitle:FlxText;
 	var bgSprite:FlxSprite;
+
+	var camFollow:FlxObject;
+	var camFollowPos:FlxObject;
 
 	private static var curWeek:Int = 0;
 
@@ -61,6 +66,13 @@ class StoryMenuState extends MusicBeatState
 		WeekData.reloadWeekFiles(true);
 		if(curWeek >= WeekData.weeksList.length) curWeek = 0;
 		persistentUpdate = persistentDraw = true;
+
+		FlxG.camera.follow(camFollowPos, null, 1);
+
+		FlxG.camera.zoom = 3;
+ 		FlxG.camera.fade(FlxG.camera.bgColor, 1, true);
+ 		FlxTween.tween(FlxG.camera, {zoom: 1}, 1.1, {ease: FlxEase.expoInOut});
+ 		FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quartInOut});
 
 		scoreText = new FlxText(10, 10, 0, "SCORE: 49324858", 36);
 		scoreText.setFormat("VCR OSD Mono", 32);
