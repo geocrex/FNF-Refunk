@@ -64,7 +64,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		var option:Option = new Option('Simple Ratings',
-			"If checked, accuracy will be rounded.",
+			"If checked, accuracy will be rounded and rating names\nwill change (e.g. S+ becomes Sick!)",
 			'simpleRatings',
 			'bool',
 			true);

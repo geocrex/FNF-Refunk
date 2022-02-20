@@ -3356,15 +3356,15 @@ class PlayState extends MusicBeatState
 		rating.screenCenter();
 		rating.x = coolText.x - 40;
 		rating.y -= 60;
-		rating.acceleration.y = 550;
-		rating.velocity.y -= FlxG.random.int(140, 175);
-		rating.velocity.x -= FlxG.random.int(0, 10);
+		//rating.acceleration.y = 550;
+		//rating.velocity.y -= FlxG.random.int(140, 175);
+		//rating.velocity.x -= FlxG.random.int(0, 10);
 		// COOL RATING ZOOM STUFF!
-		var scaleX = rating.scale.x;
-		var scaleY = rating.scale.y;
-		rating.scale.scale(1.01);
-		FlxTween.tween(rating, {"scale.x": 1, "scale.y": 1}, FlxG.random.float(0.2, 0.45), {ease: FlxEase.quadInOut});
-		FlxTween.linearMotion(rating, rating.x, rating.y, rating.x, rating.y + 5, FlxG.random.float(0.2, 0.45), true, {ease: FlxEase.quadInOut});
+		var scaleX = rating.scale.x * 0.76;
+		var scaleY = rating.scale.y  * 0.76;
+		FlxTween.tween(rating, {"scale.x": scaleX, "scale.y": scaleY}, 0.2, {ease: FlxEase.quadIn});
+		FlxTween.tween(rating, {"scale.x": 0, "scale.y": 0}, 0.25, {ease: FlxEase.quadOut, startDelay: 0.22});
+		//FlxTween.linearMotion(rating, rating.x, rating.y, rating.x, rating.y + 10, FlxG.random.float(0.2, 0.45), true, cd do{ease: FlxEase.quadInOut});
 		rating.visible = !ClientPrefs.hideHud;
 		rating.x += ClientPrefs.comboOffset[0];
 		rating.y -= ClientPrefs.comboOffset[1];
@@ -3458,20 +3458,26 @@ class PlayState extends MusicBeatState
 		coolText.text = Std.string(seperatedScore);
 		// add(coolText);
 
-		FlxTween.tween(rating, {alpha: 0}, 0.2, {
-			startDelay: Conductor.crochet * 0.001
-		});
+		//FlxTween.tween(rating, {alpha: 0}, 0.2, {
+		//	startDelay: Conductor.crochet * 0.001
+		//});
 
 		FlxTween.tween(comboSpr, {alpha: 0}, 0.2, {
-			onComplete: function(tween:FlxTween)
-			{
-				coolText.destroy();
-				comboSpr.destroy();
-
-				rating.destroy();
-			},
-			startDelay: Conductor.crochet * 0.001
-		});
+			//onComplete: function(tween:FlxTween)
+			//{
+			//	if(rating.alive){
+			//		FlxTween.tween(rating, {"scale.x": 0, "scale.y": 0}, 0.2, {
+			//			onComplete: function(tween:FlxTween)
+			//			{
+			//				rating.destroy();
+			//			},
+			//			ease: FlxEase.quadIn,
+			//			startDelay: 0.6
+			//		});
+			//	}
+			//},
+			ease: FlxEase.quadOut
+			});
 	}
 
 	private function onKeyPress(event:KeyboardEvent):Void
@@ -4365,11 +4371,11 @@ class PlayState extends MusicBeatState
 
 			// Rating FC
 			ratingFC = "";
-			if (sicks > 0) ratingFC = "MFC";
-			if (goods > 0) ratingFC = "GFC";
-			if (bads > 0 || shits > 0) ratingFC = "FC";
-			if (songMisses > 0 && songMisses < 10) ratingFC = "SDCB";
-			else if (songMisses >= 10) ratingFC = "Clear";
+			if (sicks > 0) ratingFC = "SFC"; // Sick! Full Combo
+			if (goods > 0) ratingFC = "GFC"; // Good Full Combo
+			if (bads > 0 || shits > 0) ratingFC = "FC"; // Full Combo
+			if (songMisses > 0 && songMisses < 10) ratingFC = "SDCB"; // Single Digit Combo Break
+			else if (songMisses >= 10) ratingFC = "Clear"; // ???
 		}
 		setOnLuas('rating', ratingPercent);
 		setOnLuas('ratingName', ratingName);
